@@ -6,7 +6,19 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "deploy": "npm publish --access=public"
   },
-  "keywords": ["monkey","patch","remote","module","component","dynamic","import"],
+  "keywords": [
+    "monkey",
+    "patch",
+    "remote",
+    "module",
+    "component",
+    "dynamic",
+    "import",
+    "federation",
+    "micro",
+    "front",
+    "end"
+  ],
   "author": "",
   "license": "MIT",
   "description": ""

@@ -1,7 +1,5 @@
 import React, { Suspense, useMemo } from 'react';
 
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-
 import packages from './packages';
 
 function getParsedModule(code, moduleName, packages) {
@@ -30,9 +28,9 @@ function getParsedModule(code, moduleName, packages) {
   return require(moduleName);
 }
 
-export async function fetchComponent(id) {
+export async function fetchComponent(id, url) {
   try {
-    const response = await fetch(`http://localhost:8080/index.js`, {
+    const response = await fetch(url, {
       method: 'GET',
     });
     if (!response.ok) {
@@ -46,24 +44,14 @@ export async function fetchComponent(id) {
   }
 }
 
-const DynamicComponent = ({ __id, ...props }) => {
-  const Component = useMemo(() => {
-    return React.lazy(async () => fetchComponent(__id));
-  }, [__id]);
-
-
+const Main = ({ __id, url, ...props }) => {
+  const Component = useMemo(() => React.lazy(async () => fetchComponent(__id, url)), [__id]);
 
   return (
-    <Suspense
-      fallback={
-        <></>
-      }
-    >
-      <SafeAreaProvider>
-        <Component {...props} />
-      </SafeAreaProvider>
+    <Suspense fallback={<></>}>
+      <Component {...props} />
     </Suspense>
   );
 };
 
-export default React.memo(DynamicComponent);
+export default React.memo(Main);
