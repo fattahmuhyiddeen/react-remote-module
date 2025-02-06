@@ -1,0 +1,12 @@
+{
+  "name": "react-remote-module",
+  "version": "0.0.1",
+  "main": "index.jsx",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["monkey","patch","remote","module","component","dynamic","import"],
+  "author": "",
+  "license": "MIT",
+  "description": ""
+}
