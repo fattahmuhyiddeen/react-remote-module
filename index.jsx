@@ -40,8 +40,8 @@ export async function fetchComponent(id, url) {
   }
 }
 
-const Main = ({ __id, url, ...props }) => {
-  const Component = useMemo(() => React.lazy(async () => fetchComponent(__id, url)), [__id]);
+const Main = ({ __id, url, LocalComponent, ...props }) => {
+  const Component = useMemo(() => LocalComponent || React.lazy(async () => fetchComponent(__id, url)), [LocalComponent, __id]);
 
   return (
     <Suspense fallback={<></>}>
