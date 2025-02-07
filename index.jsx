@@ -1,28 +1,27 @@
-import React, { Suspense, useMemo } from 'react';
+import React, { Suspense, useMemo } from "react";
 
-import packages from './packages';
+import packages from "./packages";
 
 function getParsedModule(code, moduleName, packages) {
-  const _this = Object.create(packages);
+  const obj = Object.create(packages);
 
   function require(name) {
-    if (!(name in _this) && moduleName === name) {
+    if (!(name in obj) && moduleName === name) {
       const module = { exports: {} };
-      _this[name] = () => module;
+      obj[name] = () => module;
 
       try {
-        const wrappedCode = `(function(require, exports, module) { ${code} })`;
-        const wrapper = eval(wrappedCode);
+        const wrapper = eval(`(function(require, exports, module) { ${code} })`);
         wrapper(require, module.exports, module);
       } catch (e) {
         console.error(`Error evaluating module ${name}:`, e);
         throw e;
       }
-    } else if (!(name in _this)) {
+    } else if (!(name in obj)) {
       throw `Module '${name}' not found`;
     }
 
-    return _this[name]().exports;
+    return obj[name]().exports;
   }
 
   return require(moduleName);
@@ -30,15 +29,12 @@ function getParsedModule(code, moduleName, packages) {
 
 export async function fetchComponent(id, url) {
   try {
-    const response = await fetch(url, {
-      method: 'GET',
-    });
+    const response = await fetch(url);
     if (!response.ok) {
-      throw new Error('Network response was not ok');
+      throw new Error("Fail to request " + url);
     }
-    const text = await response.text();
 
-    return { default: getParsedModule(text, id, packages) };
+    return { default: getParsedModule(await response.text(), id, packages) };
   } catch (error) {
     return { default: () => false };
   }
