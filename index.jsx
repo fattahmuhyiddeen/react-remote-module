@@ -1,6 +1,7 @@
-import React, { Suspense, useMemo } from "react";
+import React, { Suspense, useMemo, useState } from 'react';
 
-import packages from "./packages";
+import packages from './packages';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 function getParsedModule(code, moduleName, packages) {
   const obj = Object.create(packages);
@@ -27,27 +28,51 @@ function getParsedModule(code, moduleName, packages) {
   return require(moduleName);
 }
 
-export async function fetchComponent(id, url) {
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error("Fail to request " + url);
+const Main = ({ __id, url, LocalComponent, ErrorComponent = () => false, ...props }) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(true);
+
+  const fetchComponent = async (id, url) => {
+    try {
+      const response = await fetch(url);
+      setIsLoading(false);
+      setIsError(true);
+      if (!response.ok) {
+        throw new Error('Fail to request ' + url);
+      }
+
+      return { default: getParsedModule(await response.text(), id, packages) };
+    } catch (error) {
+      setIsLoading(false);
+      setIsError(true);
+      return { default: () => false };
     }
-
-    return { default: getParsedModule(await response.text(), id, packages) };
-  } catch (error) {
-    return { default: () => false };
-  }
-}
-
-const Main = ({ __id, url, LocalComponent, ...props }) => {
-  const Component = useMemo(() => LocalComponent || React.lazy(async () => fetchComponent(__id, url)), [LocalComponent, __id]);
+  };
+  const Component = useMemo(
+    () => LocalComponent || React.lazy(() => fetchComponent(__id, url)),
+    [LocalComponent, __id],
+  );
 
   return (
     <Suspense fallback={<></>}>
-      <Component {...props} />
+      {isLoading && (
+        <View style={styles.loader}>
+          <ActivityIndicator />
+        </View>
+      )}
+      {isError ? <ErrorComponent /> : <Component {...props} />}
     </Suspense>
   );
 };
 
 export default React.memo(Main);
+
+const styles = StyleSheet.create({
+  loader: {
+    position: 'absolute',
+    height: '100%',
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});

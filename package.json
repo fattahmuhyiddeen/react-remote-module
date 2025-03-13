@@ -1,6 +1,6 @@
 {
   "name": "react-remote-module",
-  "version": "0.0.5",
+  "version": "1.0.0",
   "main": "index.jsx",
   "scripts": {
     "postinstall": "node postinstall.js",
