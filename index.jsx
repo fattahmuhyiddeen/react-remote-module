@@ -28,16 +28,22 @@ function getParsedModule(code, moduleName, packages) {
   return require(moduleName);
 }
 
-const Main = ({ __id, url, LocalComponent, ErrorComponent = () => false, ...props }) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(true);
+const defaultLoading = () => (
+  <View style={styles.loader}>
+    <ActivityIndicator />
+  </View>
+)
+
+const Main = ({ __id, url, LocalComponent, ErrorComponent = () => false, LoadingComponent = defaultLoading, ...props }) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
 
   const fetchComponent = async (id, url) => {
     try {
       const response = await fetch(url);
       setIsLoading(false);
-      setIsError(true);
       if (!response.ok) {
+        setIsError(true);
         throw new Error('Fail to request ' + url);
       }
 
@@ -55,11 +61,7 @@ const Main = ({ __id, url, LocalComponent, ErrorComponent = () => false, ...prop
 
   return (
     <Suspense fallback={<></>}>
-      {isLoading && (
-        <View style={styles.loader}>
-          <ActivityIndicator />
-        </View>
-      )}
+      {isLoading && <LoadingComponent />}
       {isError ? <ErrorComponent /> : <Component {...props} />}
     </Suspense>
   );
