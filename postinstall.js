@@ -7,8 +7,9 @@ const libs = Object.keys(packageFile.dependencies);
 
 const varName = (key, index) => key.replace(/[^A-Za-z]/g, '').toUpperCase() + 'x' + index;
 
+const libsToExclude = ['sharp'];
 for (let i = 0, l = libs.length; i < l; i++) {
-  fs.writeSync(packagesFile, `import * as ${varName(libs[i], i)} from "${libs[i]}"\n`);
+  if (!libsToExclude.includes(libs[i])) fs.writeSync(packagesFile, `import * as ${varName(libs[i], i)} from "${libs[i]}"\n`);
 }
 
 fs.writeSync(packagesFile, 'const Packages = {\n');
